@@ -6,13 +6,15 @@ import MediaPlayer from "../../components/MediaPlayer";
 import useAgora from "../../hooks/useAgora";
 import { APP_ID } from "../../lib/config";
 import CallEndIcon from "@material-ui/icons/CallEnd";
-import { IconButton } from "@material-ui/core";
+import { IconButton, Modal, Button } from "@material-ui/core";
 import CallIcon from "@material-ui/icons/Call";
 import MicIcon from "@material-ui/icons/Mic";
 import MicOffIcon from "@material-ui/icons/MicOff";
+import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 import VideocamIcon from "@material-ui/icons/Videocam";
 import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import queryString from "query-string";
+import UserPrescriptionModal from "./UserPrescriptionModal";
 
 const client = AgoraRTC.createClient({ codec: "h264", mode: "rtc" });
 
@@ -38,18 +40,7 @@ const Conference = (props) => {
     calculateGridSize(remoteUsers)
   );
 
-  // React.useEffect(() => {
-  //   const options = { ...localMedia };
-  //   join(
-  //     "0b47427ee7334417a90ff22c4e537b08",
-  //     "Vanquyento@gmail.com_n3@gmail.com",
-  //     "007eJxTYFBMTiybNS0x8pFfZs273nuaz0J6vk59VsA8d/uf2F0zDi5VYDBIMjE3MTJPTTU3NjYxMTRPtDRISzMySjZJNTU2TzKwKAmxSWsIZGSol9rJwsjAyMACxCA+E5hkBpMsYFKRISwxr7C0MjWvJN8hPTcxM0cvOT83Ps8YwWFgAADPAi4O",
-  //     136,
-  //     options
-  //   ).then((res) => {
-  //     console.log(res);
-  //   });
-  // }, []);
+  const [modalOpen, setModalOpen] = useState(false);
 
   React.useEffect(() => {
     const options = { ...localMedia };
@@ -99,6 +90,14 @@ const Conference = (props) => {
     }
   };
 
+  const handleModalOpen = () => {
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
+
   return (
     <React.Fragment>
       <div
@@ -134,6 +133,13 @@ const Conference = (props) => {
           />
         </div>
         <div className="controller_icons">
+          <IconButton
+            className="p-2 m-2"
+            onClick={handleModalOpen}
+            style={{ background: "#808080" }}
+          >
+            <LocalHospitalIcon color="primary" style={{ color: "#fff" }} />
+          </IconButton>
           <IconButton
             className="p-2 m-2"
             onClick={handleAudioClick}
@@ -196,6 +202,7 @@ const Conference = (props) => {
           font-size: 2rem;
         }
       `}</style>
+      <UserPrescriptionModal open={modalOpen} onClose={handleModalClose} />
     </React.Fragment>
   );
 };

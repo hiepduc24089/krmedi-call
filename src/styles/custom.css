@@ -1,0 +1,55 @@
+/* custom.css */
+
+.modal-content {
+    background-color: white;
+    padding: 6px;
+    border-radius: 8px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+  }
+  
+  .modal-title {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+  
+  .modal-table {
+    width: 100%;
+    margin-bottom: 2rem;
+  }
+  
+  .modal-table-header {
+    text-align: center;
+    border: 1px solid black;
+    padding: 4px;
+  }
+  
+  .modal-table-cell {
+    text-align: center;
+    border: 1px solid black;
+    padding: 4px;
+  }
+  
+  .modal-button {
+    margin-top: 1rem;
+  }
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+  
+  .button-group button {
+    flex-basis: 50%;
+    width: 100%;
+    margin: 0;
+  }
+
