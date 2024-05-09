@@ -8,9 +8,68 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-width: 90%;
+    max-width: 900px;
     max-height: 90%;
     overflow-y: auto;
+  }
+
+  .scrollable {
+    overflow-y: auto;
+    max-height: 400px; /* Adjust the value as needed */
+  }
+
+  .repeater-form {
+    margin: 1rem;
+  }
+  
+  .form-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 10px;
+  }
+
+  .form-row input[type="text"] {
+    flex: 1;
+    width: 100%; /* Set the text input to full width */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .form-row input[type="number"] {
+    flex: 1;
+    width: 50%; /* Set the number input to 50% width */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .remove-row-button {
+    background-color: #ff5a5f;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .remove-row-button:hover {
+    background-color: #e40007;
+  }
+  
+  .add-row-button {
+    margin-top: 1rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .add-row-button:hover {
+    background-color: #45a049;
   }
   
   .modal-title {

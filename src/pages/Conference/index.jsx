@@ -11,10 +11,14 @@ import CallIcon from "@material-ui/icons/Call";
 import MicIcon from "@material-ui/icons/Mic";
 import MicOffIcon from "@material-ui/icons/MicOff";
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
+import LocalPharmacyIcon from '@material-ui/icons/LocalPharmacy';
 import VideocamIcon from "@material-ui/icons/Videocam";
 import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import queryString from "query-string";
 import UserPrescriptionModal from "./UserPrescriptionModal";
+import DoctorPrescriptionModal from "./DoctorPrescriptionModal";
+//API
+import { checkUserRoleById } from "../../lib/api";
 
 const client = AgoraRTC.createClient({ codec: "h264", mode: "rtc" });
 
@@ -35,12 +39,14 @@ const Conference = (props) => {
     joinLocalVideoTrack,
     joinLocalAudioTrack,
   } = useAgora(client);
+  const [isDoctor, setIsDoctor] = useState(false);
   const [localMedia, setLocalMedia] = useState({ audio: false, video: false });
   const [gridSize, setGridSize] = useState(() =>
     calculateGridSize(remoteUsers)
   );
 
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalPatientOpen, setModalPatientOpen] = useState(false);
+  const [modalDoctorOpen, setModalDoctorOpen] = useState(false);
 
   React.useEffect(() => {
     const options = { ...localMedia };
@@ -69,6 +75,24 @@ const Conference = (props) => {
     }
   };
 
+  //CHECK USER ROLE
+  React.useEffect(() => {
+    const fetchUserRoleById = async (user_id) => {
+      try {
+        const response = await checkUserRoleById(user_id);
+        const isDoctor = response === 'DOCTORS';
+        setIsDoctor(isDoctor);
+      } catch (error) {
+        console.error(error);
+        // Handle error if needed
+      }
+    };
+
+    if (user_id !== 0) {
+      fetchUserRoleById(user_id);
+    }
+  }, []);
+
   const handleVideoClick = () => {
     if (!localMedia.video) {
       setLocalMedia((prev) => ({ ...prev, video: true }));
@@ -90,12 +114,20 @@ const Conference = (props) => {
     }
   };
 
-  const handleModalOpen = () => {
-    setModalOpen(true);
+  const handleModalPatientOpen = () => {
+    setModalPatientOpen(true);
   };
 
-  const handleModalClose = () => {
-    setModalOpen(false);
+  const handleModalPatientClose = () => {
+    setModalPatientOpen(false);
+  };
+
+  const handleModalDoctorOpen = () => {
+    setModalDoctorOpen(true);
+  };
+
+  const handleModalDoctorClose = () => {
+    setModalDoctorOpen(false);
   };
 
   return (
@@ -133,13 +165,25 @@ const Conference = (props) => {
           />
         </div>
         <div className="controller_icons">
-          <IconButton
-            className="p-2 m-2"
-            onClick={handleModalOpen}
-            style={{ background: "#808080" }}
-          >
-            <LocalHospitalIcon color="primary" style={{ color: "#fff" }} />
-          </IconButton>
+          {isDoctor ? (
+            //Kê đơn
+            <IconButton
+              className="p-2 m-2"
+              onClick={handleModalDoctorOpen}
+              style={{ background: "#ADD8E6" }}
+            >
+              <LocalPharmacyIcon color="primary" style={{ color: "#fff" }} />
+            </IconButton>
+          ) : (
+            //Nhận đơn
+            <IconButton
+              className="p-2 m-2"
+              onClick={handleModalPatientOpen}
+              style={{ background: "#FF0000" }}
+            >
+              <LocalHospitalIcon color="primary" style={{ color: "#fff" }} />
+            </IconButton>
+          )}
           <IconButton
             className="p-2 m-2"
             onClick={handleAudioClick}
@@ -202,7 +246,8 @@ const Conference = (props) => {
           font-size: 2rem;
         }
       `}</style>
-      <UserPrescriptionModal open={modalOpen} onClose={handleModalClose} />
+      <UserPrescriptionModal open={modalPatientOpen} onClose={handleModalPatientClose} />
+      <DoctorPrescriptionModal open={modalDoctorOpen} onClose={handleModalDoctorClose} />
     </React.Fragment>
   );
 };
