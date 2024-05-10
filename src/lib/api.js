@@ -18,3 +18,21 @@ export const checkUserRoleById = async (user_id) => {
         return error;
     }
 };
+
+export const searchMedicine = async (searchKey) => {
+    try {
+        const response = await axios.get(API_URL + `api/prescription/search/medicine`, {
+            headers, 
+            params: {
+                search_key: searchKey
+            }
+        });
+        if (response.data.error === 0) {
+            const data = response.data.data;
+            return data;
+        }
+    } catch (error) {
+        console.error(error);
+        return error;
+    }
+};
