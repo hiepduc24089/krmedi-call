@@ -7,8 +7,15 @@ import "select2/dist/css/select2.min.css";
 import "select2/dist/js/select2.full.min.js";
 //API
 import { searchMedicine } from "../../lib/api";
+import { addToCart } from "../../lib/api";
 
-const DoctorPrescriptionModal = ({ open, onClose }) => {
+const DoctorPrescriptionModal = ({
+  open,
+  onClose,
+  accessToken,
+  doctorId,
+  patientId,
+}) => {
   const API_URL = "https://krmedi.vn:81/";
 
   const [currentPrescription, setCurrentPrescription] = useState(0);
@@ -20,9 +27,7 @@ const DoctorPrescriptionModal = ({ open, onClose }) => {
   // const selectRef = useRef(null);
 
   useEffect(() => {
-    console.log(prescriptions);
     if (currentPrescription < count) {
-      console.log(count);
       initializeSelect2(count);
       setCurrentPrescription(count);
     }
@@ -64,7 +69,7 @@ const DoctorPrescriptionModal = ({ open, onClose }) => {
 
     selectElement.on("select2:select", (e) => {
       var data = e.params.data;
-      handlePrescriptionChange(index, "name", data.id);
+      handlePrescriptionChange(index, "id", data.id);
     });
   };
 
@@ -77,9 +82,16 @@ const DoctorPrescriptionModal = ({ open, onClose }) => {
   const handleAddPrescription = () => {
     setPrescriptions([
       ...prescriptions,
-      { name: "", quantity: "", treatmentDays: "", note: "" },
+      { id: "", quantity: "", treatmentDays: "", note: "" },
     ]);
     setCount(count + 1);
+  };
+
+  const handleResetForm = () => {
+    setPrescriptions([]);
+    setCount(-1);
+    destroySelect2();
+    onClose();
   };
 
   const handlePrescriptionChange = (index, field, value) => {
@@ -101,27 +113,26 @@ const DoctorPrescriptionModal = ({ open, onClose }) => {
   //LƯU ĐƠN THUỐC
   const handleSave = async () => {
     try {
+      const requestData = {
+        user_id: patientId, // Replace userId with the actual user ID value
+        products: prescriptions, // Assuming prescriptions is an array containing the product data
+        doctor_id: doctorId, // Replace with the actual doctor_id value if needed
+      };
+
       // Make the API call to store the data
-      const response = await fetch(API_URL + "your-endpoint", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          // Add any additional headers as needed
-        },
-        body: JSON.stringify(prescriptions),
-      });
+      const response = await addToCart(requestData, accessToken);
 
       // Handle the response
-      if (response.ok) {
-        // Data was successfully stored
-        // Perform any additional actions (e.g., show a success message, update state, etc.)
+      if (response.error == 0) {
+        handleResetForm();
+        alert("Thành công");
       } else {
         // Handle the error case
-        // You can throw an error or perform any necessary error handling
+        console.error("Something went wrong");
       }
     } catch (error) {
       // Handle any network or other errors
-      // You can throw an error or perform any necessary error handling
+      console.error(error);
     }
   };
 
@@ -133,7 +144,7 @@ const DoctorPrescriptionModal = ({ open, onClose }) => {
             <select
               id={`select-${index}`}
               className="form-control search-select"
-              value={prescription.name}
+              value={prescription.id}
               data-index={index}
               readOnly
               key={index}

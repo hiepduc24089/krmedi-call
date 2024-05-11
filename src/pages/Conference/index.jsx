@@ -23,11 +23,13 @@ import { checkUserRoleById } from "../../lib/api";
 const client = AgoraRTC.createClient({ codec: "h264", mode: "rtc" });
 
 const Conference = (props) => {
-  const query = queryString.parse(window?.location?.search);
-  const appid = APP_ID || null;
-  const token = query?.token ? query.token.split(' ').join('+') : null;
-  const channel = query?.channel || null;
-  const user_id = query?.user_id || 0;
+  const query       = queryString.parse(window?.location?.search);
+  const appid       = APP_ID || null;
+  const token       = query?.token ? query.token.split(' ').join('+') : null;
+  const channel     = query?.channel || null;
+  const user_id     = query?.user_id || 0;
+  const guest_id    = query?.guest_id || 0;
+  const accessToken = query?.accessToken || null;
   const {
     remoteUsers,
     join,
@@ -247,7 +249,7 @@ const Conference = (props) => {
         }
       `}</style>
       <UserPrescriptionModal open={modalPatientOpen} onClose={handleModalPatientClose} />
-      <DoctorPrescriptionModal open={modalDoctorOpen} onClose={handleModalDoctorClose} />
+      <DoctorPrescriptionModal open={modalDoctorOpen} onClose={handleModalDoctorClose} accessToken={accessToken} doctorId={user_id} patientId={guest_id}/>
     </React.Fragment>
   );
 };
