@@ -7,7 +7,7 @@ import "select2/dist/css/select2.min.css";
 import "select2/dist/js/select2.full.min.js";
 //API
 import { searchMedicine } from "../../lib/api";
-import { addToCart } from "../../lib/api";
+import { addToPrescriptionCart } from "../../lib/api";
 
 const DoctorPrescriptionModal = ({
   open,
@@ -114,22 +114,25 @@ const DoctorPrescriptionModal = ({
   const handleSave = async () => {
     try {
       const requestData = {
-        user_id: patientId, // Replace userId with the actual user ID value
-        products: prescriptions, // Assuming prescriptions is an array containing the product data
-        doctor_id: doctorId, // Replace with the actual doctor_id value if needed
+        chatUserId: patientId,
+        created_by: doctorId,
+        products: JSON.stringify(prescriptions),
+        // prescriptions: data,
       };
 
       // Make the API call to store the data
-      const response = await addToCart(requestData, accessToken);
+      const response = await addToPrescriptionCart(requestData, accessToken);
+
+      console.log(response)
 
       // Handle the response
-      if (response.error == 0) {
-        handleResetForm();
-        alert("Thành công");
-      } else {
-        // Handle the error case
-        console.error("Something went wrong");
-      }
+      // if (response.error == 0) {
+      //   alert("Thành công");
+      //   handleResetForm();
+      // } else {
+      //   // Handle the error case
+      //   console.error("Something went wrong");
+      // }
     } catch (error) {
       // Handle any network or other errors
       console.error(error);

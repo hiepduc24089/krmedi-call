@@ -39,9 +39,9 @@ export const searchMedicine = async (searchKey) => {
     }
 };
 
-export const addToCart = async (requestData, accessToken) => {
+export const addToPrescriptionCart = async (requestData, accessToken) => {
     try {
-        const response = await axios.post(API_URL + "api/carts/create-v2", requestData, {
+        const response = await axios.post(API_URL + "api/prescription-result/create", requestData, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ` + accessToken,
