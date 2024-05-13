@@ -25,6 +25,28 @@ const UserPrescriptionModal = ({ open, onClose, patientId }) => {
     
   }, []);
 
+  // useEffect(() => {
+  //   const echo = new Echo({
+  //     broadcaster: "pusher",
+  //     key: PUSHER_APP_KEY,
+  //     cluster: PUSHER_APP_CLUSTER,
+  //     encrypted: true,
+  //     authEndpoint: API_URL + "broadcasting/auth", // Set the correct URL here
+  //     // additional options if needed
+  //   });
+
+  //   // const channel = echo.channel("message." + patientId);
+
+  //   echo.private("messages." + patientId).listen('NewMessage', function (e) {
+  //     console.log(e);
+  //     });
+
+  //   return () => {
+  //     // Cleanup code when the component unmounts
+  //     echo.disconnect();
+  //   };
+  // }, []);
+
   return (
     <Modal
       open={open}
