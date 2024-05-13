@@ -1,8 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Button } from "@material-ui/core";
 import "../../styles/custom.css";
+import Pusher from "pusher-js";
+import Echo from "laravel-echo";
+import { PUSHER_APP_KEY, PUSHER_APP_CLUSTER } from "../../lib/pusher";
+import { API_URL } from "../../lib/api";
 
-const UserPrescriptionModal = ({ open, onClose }) => {
+const UserPrescriptionModal = ({ open, onClose, patientId }) => {
+  const [tbodyData, setTbodyData] = useState([]);
+
+  useEffect(() => {
+    Pusher.logToConsole = true;
+
+    const pusher = new Pusher(PUSHER_APP_KEY, {
+      cluster: PUSHER_APP_CLUSTER,
+      encrypted: true,
+    });
+
+    const channel = pusher.subscribe("messages." + patientId);
+
+    channel.bind("NewMessage", function(data) {
+      console.log(data)
+    });
+    
+  }, []);
+
   return (
     <Modal
       open={open}
@@ -15,27 +37,18 @@ const UserPrescriptionModal = ({ open, onClose }) => {
           <thead>
             <tr>
               <th className="modal-table-header">#</th>
-              <th className="modal-table-header">Sản phẩm</th>
-              <th className="modal-table-header">Số lượng</th>
-              <th className="modal-table-header">Ngày điều trị</th>
-              <th className="modal-table-header">Lưu ý</th>
+              <th className="modal-table-header">Giỏ hàng</th>
+              <th className="modal-table-header">Tin nhắn</th>
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="modal-table-cell">1</td>
-              <td className="modal-table-cell">Value 2</td>
-              <td className="modal-table-cell">Value 3</td>
-              <td className="modal-table-cell">Value 2</td>
-              <td className="modal-table-cell">Value 3</td>
-            </tr>
-            <tr>
-              <td className="modal-table-cell">2</td>
-              <td className="modal-table-cell">Value 5</td>
-              <td className="modal-table-cell">Value 6</td>
-              <td className="modal-table-cell">Value 2</td>
-              <td className="modal-table-cell">Value 3</td>
-            </tr>
+            {tbodyData.map((data, index) => (
+              <tr key={index}>
+                <td className="modal-table-cell">{data.prescription_id}</td>
+                <td className="modal-table-cell">{data.carts}</td>
+                <td className="modal-table-cell">{data.message}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
         <div className="button-group">

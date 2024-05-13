@@ -24,12 +24,11 @@ const client = AgoraRTC.createClient({ codec: "h264", mode: "rtc" });
 
 const Conference = (props) => {
   const query       = queryString.parse(window?.location?.search);
-  const appid       = APP_ID || null;
-  const token       = query?.token ? query.token.split(' ').join('+') : null;
-  const channel     = query?.channel || null;
-  const user_id     = query?.user_id || 0;
-  const guest_id    = query?.guest_id || 0;
-  const accessToken = query?.accessToken || null;
+  const appid       = APP_ID || null;                                           //Agora app id
+  const token       = query?.token ? query.token.split(' ').join('+') : null;   //Agora token
+  const channel     = query?.channel || null;                                   //Agora channel
+  const user_id     = query?.user_id || 0;                                      //Current user
+  const guest_id    = query?.guest_id || 0;                                     //Remote user
   const {
     remoteUsers,
     join,
@@ -248,8 +247,8 @@ const Conference = (props) => {
           font-size: 2rem;
         }
       `}</style>
-      <UserPrescriptionModal open={modalPatientOpen} onClose={handleModalPatientClose} />
-      <DoctorPrescriptionModal open={modalDoctorOpen} onClose={handleModalDoctorClose} accessToken={accessToken} doctorId={user_id} patientId={guest_id}/>
+      <UserPrescriptionModal open={modalPatientOpen} onClose={handleModalPatientClose} patientId={user_id}/>
+      <DoctorPrescriptionModal open={modalDoctorOpen} onClose={handleModalDoctorClose} doctorId={user_id} patientId={guest_id}/>
     </React.Fragment>
   );
 };

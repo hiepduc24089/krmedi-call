@@ -12,7 +12,6 @@ import { addToPrescriptionCart } from "../../lib/api";
 const DoctorPrescriptionModal = ({
   open,
   onClose,
-  accessToken,
   doctorId,
   patientId,
 }) => {
@@ -82,7 +81,7 @@ const DoctorPrescriptionModal = ({
   const handleAddPrescription = () => {
     setPrescriptions([
       ...prescriptions,
-      { id: "", quantity: "", treatmentDays: "", note: "" },
+      { id: "", quantity: "", treatment_days: "", note: "" },
     ]);
     setCount(count + 1);
   };
@@ -121,7 +120,7 @@ const DoctorPrescriptionModal = ({
       };
 
       // Make the API call to store the data
-      const response = await addToPrescriptionCart(requestData, accessToken);
+      const response = await addToPrescriptionCart(requestData);
 
       console.log(response)
 
@@ -173,9 +172,9 @@ const DoctorPrescriptionModal = ({
               type="text"
               className="form-control mb-3"
               placeholder="Treatment Days"
-              value={prescription.treatmentDays}
+              value={prescription.treatment_days}
               onChange={(e) =>
-                handlePrescriptionChange(index, "treatmentDays", e.target.value)
+                handlePrescriptionChange(index, "treatment_days", e.target.value)
               }
             />
           </div>
