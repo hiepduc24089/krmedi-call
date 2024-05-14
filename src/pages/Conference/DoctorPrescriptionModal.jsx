@@ -6,6 +6,7 @@ import $ from "jquery";
 import "select2/dist/css/select2.min.css";
 import "select2/dist/js/select2.full.min.js";
 //API
+import { API_URL } from "../../lib/api";
 import { searchMedicine } from "../../lib/api";
 import { addToPrescriptionCart } from "../../lib/api";
 
@@ -15,7 +16,6 @@ const DoctorPrescriptionModal = ({
   doctorId,
   patientId,
 }) => {
-  const API_URL = "https://krmedi.vn:81/";
 
   const [currentPrescription, setCurrentPrescription] = useState(0);
 
@@ -44,7 +44,7 @@ const DoctorPrescriptionModal = ({
       minimumInputLength: 1,
       dropdownParent: selectElement.parent(),
       ajax: {
-        url: API_URL + `api/prescription/search/medicine`,
+        url: API_URL + `/api/prescription/search/medicine`,
         dataType: "json",
         delay: 250,
         data: function (params) {

@@ -1,87 +1,98 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button } from "@material-ui/core";
-import "../../styles/custom.css";
-import Pusher from "pusher-js";
-import Echo from "laravel-echo";
-import { PUSHER_APP_KEY, PUSHER_APP_CLUSTER } from "../../lib/pusher";
+// import { Modal, Button } from "@material-ui/core";
+import { Button, Modal, Table } from "react-bootstrap";
+import { echo } from "../../lib/pusher";
 import { API_URL } from "../../lib/api";
 
 const UserPrescriptionModal = ({ open, onClose, patientId }) => {
   const [tbodyData, setTbodyData] = useState([]);
+  const [prescriptionId, setPrescriptionId] = useState(null);
 
   useEffect(() => {
-    Pusher.logToConsole = true;
+    const handleNewPrescription = (e) => {
+      setTbodyData(e.carts);
+      setPrescriptionId(e.prescription_id);
+    };
 
-    const pusher = new Pusher(PUSHER_APP_KEY, {
-      cluster: PUSHER_APP_CLUSTER,
-      encrypted: true,
-    });
+    echo
+      .channel("messages." + patientId)
+      .listen("NewMessage", handleNewPrescription);
 
-    const channel = pusher.subscribe("messages." + patientId);
-
-    channel.bind("NewMessage", function(data) {
-      console.log(data)
-    });
-    
+    return () => {
+      // Cleanup code when the component unmounts
+      echo.disconnect();
+    };
   }, []);
 
-  // useEffect(() => {
-  //   const echo = new Echo({
-  //     broadcaster: "pusher",
-  //     key: PUSHER_APP_KEY,
-  //     cluster: PUSHER_APP_CLUSTER,
-  //     encrypted: true,
-  //     authEndpoint: API_URL + "broadcasting/auth", // Set the correct URL here
-  //     // additional options if needed
-  //   });
-
-  //   // const channel = echo.channel("message." + patientId);
-
-  //   echo.private("messages." + patientId).listen('NewMessage', function (e) {
-  //     console.log(e);
-  //     });
-
-  //   return () => {
-  //     // Cleanup code when the component unmounts
-  //     echo.disconnect();
-  //   };
-  // }, []);
+  useEffect(() => {
+    console.log(tbodyData);
+  }, [tbodyData]);
 
   return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      className="flex items-center justify-center"
-    >
-      <div className="modal-content">
-        <h3 className="modal-title">Đơn thuốc của bạn</h3>
-        <table className="modal-table">
+    <Modal show={open} onHide={onClose} centered size="lg">
+      <Modal.Header>
+        <Modal.Title className="d-flex align-items-center justify-content-center w-100">
+          Đơn thuốc của bạn
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body style={{ maxHeight: "400px" }}>
+        <Table
+          striped
+          bordered
+          hover
+          style={{ maxHeight: "400px", overflow: "auto" }}
+        >
           <thead>
             <tr>
-              <th className="modal-table-header">#</th>
-              <th className="modal-table-header">Giỏ hàng</th>
-              <th className="modal-table-header">Tin nhắn</th>
+              <th>#</th>
+              <th>Sản phẩm</th>
+              <th>Số lượng</th>
+              <th>Ngày điều trị</th>
+              <th>Lưu ý</th>
             </tr>
           </thead>
           <tbody>
-            {tbodyData.map((data, index) => (
-              <tr key={index}>
-                <td className="modal-table-cell">{data.prescription_id}</td>
-                <td className="modal-table-cell">{data.carts}</td>
-                <td className="modal-table-cell">{data.message}</td>
+            {tbodyData.length === 0 ? (
+              <tr>
+                <td colSpan="5" className="text-center">
+                  Bạn hiện chưa có đơn thuốc
+                </td>
               </tr>
-            ))}
+            ) : (
+              tbodyData.map((data, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>
+                    <p>{data.product_name}</p>
+                    <img src={API_URL + data.product_thumbnail} alt="Product" />
+                  </td>
+                  <td>{data.quantity}</td>
+                  <td>{data.treatment_days}</td>
+                  <td>{data.note}</td>
+                </tr>
+              ))
+            )}
           </tbody>
-        </table>
-        <div className="button-group">
-          <Button variant="contained" color="primary" onClick={onClose}>
-            Close
+        </Table>
+      </Modal.Body>
+      <Modal.Footer className="d-flex justify-content-between">
+        <Button variant="secondary" onClick={onClose}>
+          Đóng
+        </Button>
+        {prescriptionId && (
+          <Button
+            variant="primary"
+            onClick={() =>
+              window.open(
+                API_URL + `/checkout?prescription_id=` + prescriptionId,
+                "_blank"
+              )
+            }
+          >
+            Tới trang thanh toán
           </Button>
-          <Button variant="contained" color="primary" onClick={onClose}>
-            Save
-          </Button>
-        </div>
-      </div>
+        )}
+      </Modal.Footer>
     </Modal>
   );
 };

@@ -1,8 +1,15 @@
-export const PUSHER_APP_ID = "1131489";
-export const PUSHER_APP_KEY = "e700f994f98dbb41ea9f";
-export const PUSHER_APP_SECRET = "7f680604ca5e7eb8cb75";
+import Pusher from "pusher-js";
+import Echo from "laravel-echo";
+import { PUSHER_APP_KEY, PUSHER_APP_CLUSTER } from "./config";
 
-export const PUSHER_HOST = '';
-export const PUSHER_PORT = 443;
-export const PUSHER_SCHEME = "https";
-export const PUSHER_APP_CLUSTER = "eu";
+export const echo = new Echo({
+    broadcaster: "pusher",
+    key: PUSHER_APP_KEY,
+    cluster: PUSHER_APP_CLUSTER,
+    wsHost: "127.0.0.1",
+    wsPort: 6001,
+    disableStats: true, // optional, to disable stats collection
+    encrypted: false, // optional, set to true if using HTTPS
+    forceTLS: false, // optional, set to true if using HTTPS
+    enabledTransports: ["ws"], // optional, use 'ws' only for WebSocket
+});
