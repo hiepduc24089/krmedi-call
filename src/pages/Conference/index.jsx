@@ -131,7 +131,10 @@ const Conference = (props) => {
     setModalDoctorOpen(false);
   };
 
-  return (
+  // Check if any of the query parameters is null
+  const isQueryValid = appid !== null && token !== null && channel !== null && user_id !== 0 && guest_id !== 0;
+
+  return isQueryValid ? (
     <React.Fragment>
       <div
         id="large_video_container"
@@ -250,7 +253,7 @@ const Conference = (props) => {
       <UserPrescriptionModal open={modalPatientOpen} onClose={handleModalPatientClose} patientId={user_id}/>
       <DoctorPrescriptionModal open={modalDoctorOpen} onClose={handleModalDoctorClose} doctorId={user_id} patientId={guest_id}/>
     </React.Fragment>
-  );
+  ) : <h2 className="mt-5">Some thing went wrong, pls try again</h2>;
 };
 
 function calculateGridSize(remoteUsers) {

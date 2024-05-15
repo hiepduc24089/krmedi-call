@@ -123,7 +123,7 @@ const DoctorPrescriptionModal = ({
       const response = await addToPrescriptionCart(requestData);
 
       // Handle the response
-      if (response.error == 0) {
+      if (response) {
         alert("Kê đơn thành công");
         handleResetForm();
       } else {
