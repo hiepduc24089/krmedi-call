@@ -122,16 +122,14 @@ const DoctorPrescriptionModal = ({
       // Make the API call to store the data
       const response = await addToPrescriptionCart(requestData);
 
-      console.log(response)
-
       // Handle the response
-      // if (response.error == 0) {
-      //   alert("Thành công");
-      //   handleResetForm();
-      // } else {
-      //   // Handle the error case
-      //   console.error("Something went wrong");
-      // }
+      if (response.error == 0) {
+        alert("Kê đơn thành công");
+        handleResetForm();
+      } else {
+        // Handle the error case
+        console.error("Something went wrong");
+      }
     } catch (error) {
       // Handle any network or other errors
       console.error(error);
