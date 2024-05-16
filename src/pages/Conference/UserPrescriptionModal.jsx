@@ -64,7 +64,7 @@ const UserPrescriptionModal = ({ open, onClose, patientId }) => {
                   <td>{index + 1}</td>
                   <td>
                     <p>{data.product_name}</p>
-                    <img src={API_URL + data.product_thumbnail} alt="Product" />
+                    <img src={API_URL + data.product_thumbnail} alt="Product" width={200}/>
                   </td>
                   <td>{data.quantity}</td>
                   <td>{data.treatment_days}</td>
