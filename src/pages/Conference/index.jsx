@@ -20,6 +20,8 @@ import UserPrescriptionModal from "./UserPrescriptionModal";
 import DoctorPrescriptionModal from "./DoctorPrescriptionModal";
 //API
 import { checkUserRoleById } from "../../lib/api";
+import { History } from "@material-ui/icons";
+import ShowHistoryExamination from "./ShowHistoryExamination";
 
 const client = AgoraRTC.createClient({ codec: "h264", mode: "rtc" });
 
@@ -51,6 +53,7 @@ const Conference = (props) => {
   const [modalDoctorOpen, setModalDoctorOpen] = useState(false);
   const [videoDevices, setVideoDevices] = useState([]);
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   React.useEffect(() => {
     const options = { ...localMedia };
@@ -126,13 +129,22 @@ const Conference = (props) => {
     }
   };
 
+  const handleHistory = () => {
+    setShowHistoryModal(true);
+  };
+
+  const handleHistoryClose = () => {
+    setShowHistoryModal(false);
+  };
+
   const handleDispose = () => {
-    const confirmed = window.confirm("Are you sure you want to close the window?");
+    const confirmed = window.confirm("Bạn có muốn kết thúc cuộc gọi này?");
   
     if (confirmed) {
       leave();
       props?.setActiveWindow?.("chat");
       setLocalMedia({ video: false, audio: false });
+      window.open("about:blank", "_self");
       window.close();
     }
   };
@@ -193,13 +205,23 @@ const Conference = (props) => {
         <div className="controller_icons">
           {isDoctor ? (
             //Kê đơn
-            <IconButton
-              className="p-2 m-2"
-              onClick={handleModalDoctorOpen}
-              style={{ background: "#ADD8E6" }}
-            >
-              <LocalPharmacyIcon color="primary" style={{ color: "#fff" }} />
-            </IconButton>
+            <>
+              <IconButton
+                className="p-2 m-2"
+                onClick={handleModalDoctorOpen}
+                style={{ background: "#ADD8E6" }}
+              >
+                <LocalPharmacyIcon color="primary" style={{ color: "#fff" }} />
+              </IconButton>
+              
+              <IconButton 
+                className="p-2 m-2"
+                onClick={handleHistory}
+                style={{ background: "#ADD8E6" }}
+              >
+                <History color="primary" style={{ color: "#fff" }} />
+              </IconButton>
+            </>  
           ) : (
             //Nhận đơn
             <IconButton
@@ -240,7 +262,6 @@ const Conference = (props) => {
             <SwitchCameraIcon style={{ color: "#fff" }} />
           </IconButton>
           <IconButton
-            disabled={remoteUsers.length < 1}
             onClick={handleDispose}
             className="p-2 m-2"
             style={{ background: remoteUsers.length < 1 ? "grey" : "red" }}
@@ -281,6 +302,7 @@ const Conference = (props) => {
       `}</style>
       <UserPrescriptionModal open={modalPatientOpen} onClose={handleModalPatientClose} patientId={user_id}/>
       <DoctorPrescriptionModal open={modalDoctorOpen} onClose={handleModalDoctorClose} doctorId={user_id} patientId={guest_id}/>
+      <ShowHistoryExamination open={showHistoryModal} onClose={handleHistoryClose} userId='321' />
     </React.Fragment>
   ) : <h2 className="mt-5">Some thing went wrong, pls try again</h2>;
 };
