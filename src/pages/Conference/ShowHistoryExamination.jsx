@@ -1,34 +1,28 @@
 import React, { useEffect, useState } from "react";
 // import { Modal, Button } from "@material-ui/core";
 import { Button, Modal, Table } from "react-bootstrap";
-import { API_URL } from "../../lib/api";
-import axios from "axios";
+import {viewPatientHistory} from '../../lib/api'
 
-const ShowHistoryExamination = ({ open, onClose, userId }) => {
+const ShowHistoryExamination = ({ open, onClose, doctorId }) => {
     const [tbodyData, setTbodyData] = useState([]);
 
     useEffect(() => {
-        if (userId) {
-          const fetchBookings = async () => {
-            try {
-              const response = await axios.get(`http://127.0.0.1:8000/api/my-bookings/list/${userId}`);
-            //   const response = await axios.get(`${API_URL}/api/my-bookings/list/${userId}`);
-              
-            if (Array.isArray(response.data)) {
-                setTbodyData(response.data);
-              } else {
-                console.error("Expected an array, but got:", response.data);
-                setTbodyData([]);
-              }
-              
-            } catch (error) {
-              console.error("Error fetching booking data:", error);
+      if (doctorId && open) {
+        fetch(`https://krmedi.vn/api/my-bookings/list/${doctorId}`)
+          .then((res) => res.json())
+          .then((res) => {
+            if (Array.isArray(res)) {
+              setTbodyData(res);
+            } else {
+              setTbodyData([]); 
             }
-          };
-    
-          fetchBookings();
-        }
-      }, [userId]);
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+            setTbodyData([]);
+          });
+      }
+    }, [doctorId, open]);
 
   return (
     <Modal show={open} onHide={onClose} centered size="lg">
@@ -37,7 +31,7 @@ const ShowHistoryExamination = ({ open, onClose, userId }) => {
           Lịch sử khám
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body style={{ maxHeight: "400px" }}>
+      <Modal.Body style={{ overflow: "auto" }}>
         <Table
           striped
           bordered

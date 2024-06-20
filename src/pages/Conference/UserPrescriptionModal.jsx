@@ -35,7 +35,7 @@ const UserPrescriptionModal = ({ open, onClose, patientId }) => {
           Đơn thuốc của bạn
         </Modal.Title>
       </Modal.Header>
-      <Modal.Body style={{ maxHeight: "400px" }}>
+      <Modal.Body>
         <Table
           striped
           bordered
