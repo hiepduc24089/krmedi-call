@@ -23,6 +23,7 @@ import { checkUserRoleById } from "../../lib/api";
 import { History } from "@material-ui/icons";
 import ShowHistoryExamination from "./ShowHistoryExamination";
 import ShowHistoryPatient from "./ShowHistoryPatient";
+import { echo } from "../../lib/pusherEndCall";
 
 const client = AgoraRTC.createClient({ codec: "h264", mode: "rtc" });
 
@@ -68,8 +69,7 @@ const Conference = (props) => {
     ).then((res) => {
       console.log(res);
     });
-  }, []);
-
+  }, [localMedia, appid, channel, token, user_id, join]);
   React.useEffect(() => {
     setGridSize(calculateGridSize(remoteUsers));
   }, [remoteUsers]);
@@ -147,16 +147,56 @@ const Conference = (props) => {
     setShowHistoryPatient(false);
   }
 
+  useEffect(() => {
+    if (!channel) {
+      console.error("Channel is undefined");
+      return;
+    }
+    console.log(`Subscribing to Echo channel: call.${channel}`);
+    
+    echo.channel(`call.${channel}`)
+      .listen('.end-call', () => {
+        handleRemoteEndCall();
+      });
+
+    return () => {
+      echo.leaveChannel(`call.${channel}`);
+    };
+  }, [channel]);
+
   const handleDispose = () => {
     const confirmed = window.confirm("Bạn có muốn kết thúc cuộc gọi này?");
   
     if (confirmed) {
-      leave();
-      props?.setActiveWindow?.("chat");
-      setLocalMedia({ video: false, audio: false });
-      window.open("about:blank", "_self");
-      window.close();
+      fetch('https://krmedi.vn/api/end-call', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({ callId: channel })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(() => {
+        handleRemoteEndCall();
+      })
+      .catch(error => {
+        console.error('There was an error ending the call:', error);
+      });
     }
+  };
+
+  const handleRemoteEndCall = () => {
+    leave();
+    props?.setActiveWindow?.("chat");
+    setLocalMedia({ video: false, audio: false });
+    window.open("about:blank", "_self");
+    window.close();
   };
 
   const handleModalPatientOpen = () => {
@@ -320,7 +360,7 @@ const Conference = (props) => {
           font-size: 2rem;
         }
       `}</style>
-      <UserPrescriptionModal open={modalPatientOpen} onClose={handleModalPatientClose} patientId={user_id}/>
+      <UserPrescriptionModal open={modalPatientOpen} onClose={handleModalPatientClose} patientId={user_id} onEndCall={handleDispose}/>
       <DoctorPrescriptionModal open={modalDoctorOpen} onClose={handleModalDoctorClose} doctorId={user_id} patientId={guest_id}/>
       <ShowHistoryExamination open={showHistoryDoctor} onClose={handleHistoryDoctorClose} doctorId={guest_id} />
       <ShowHistoryPatient open={showHistoryPatient} onClose={handleHistoryPatientClose} patientId={user_id} />
