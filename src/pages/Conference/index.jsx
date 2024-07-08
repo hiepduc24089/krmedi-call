@@ -24,6 +24,7 @@ import { History } from "@material-ui/icons";
 import ShowHistoryExamination from "./ShowHistoryExamination";
 import ShowHistoryPatient from "./ShowHistoryPatient";
 import { echo } from "../../lib/pusherEndCall";
+import { stopRecording, downloadRecord } from '../../lib/record';
 
 const client = AgoraRTC.createClient({ codec: "h264", mode: "rtc" });
 
@@ -34,6 +35,10 @@ const Conference = (props) => {
   const channel     = query?.channel || null;                                   //Agora channel
   const user_id     = query?.user_id || 0;                                      //Current user
   const guest_id    = query?.guest_id || 0;                                     //Remote user
+  const resourceId = query.resourceId;
+  const sid = query.sid;
+  const uid = query.uid;
+
   const {
     remoteUsers,
     join,
@@ -164,30 +169,42 @@ const Conference = (props) => {
     };
   }, [channel]);
 
-  const handleDispose = () => {
+  const handleDispose = async () => {
     const confirmed = window.confirm("Bạn có muốn kết thúc cuộc gọi này?");
   
     if (confirmed) {
-      fetch('https://krmedi.vn/api/end-call', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: JSON.stringify({ callId: channel })
-      })
-      .then(response => {
+      if (resourceId) {
+        //Handle Stop Record and Download Record
+        try {
+          const recordingResponse = await stopRecording(appid, resourceId, channel, uid, sid);
+          console.log("Recording stopped successfully:", recordingResponse);
+          
+          await downloadRecord(channel, sid, user_id, guest_id);
+
+        } catch (error) {
+          console.error('Error stopping recording:', error);
+        }
+      }
+      try {
+        const response = await fetch('https://krmedi.vn/api/end-call', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({ callId: channel })
+        });
+  
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
-        return response.json();
-      })
-      .then(() => {
-        handleRemoteEndCall();
-      })
-      .catch(error => {
+        await response.json();
+      
+      } catch (error) {
         console.error('There was an error ending the call:', error);
-      });
+      }
+
+      handleRemoteEndCall();
     }
   };
 
